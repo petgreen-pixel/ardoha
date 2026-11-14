@@ -817,7 +817,7 @@ document.querySelectorAll(".su").forEach(function(e){e.style.display=m==="up"?""
 document.getElementById("asub").textContent=m==="up"?"Create my account":"Log in";M.textContent="";F.password.autocomplete=m==="up"?"new-password":"current-password"}
 document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){setMode(b.dataset.m)}});
 F.onsubmit=async function(e){e.preventDefault();var em=F.email.value.trim().toLowerCase(),pw=F.password.value;
- if(!/^\\S+@\\S+\\.\\S+$/.test(em)){M.textContent="Please enter a valid email address.";return}
+ if(!/^\S+@\S+\.\S+$/.test(em)){M.textContent="Please enter a valid email address.";return}
  if(pw.length<8){M.textContent="Your password should be at least 8 characters.";return}
  if(mode==="up"&&!F.name.value.trim()){M.textContent="Please tell us your name.";return}
  var payload={email:em,password:pw};
