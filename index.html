@@ -1016,7 +1016,25 @@ else if(t.id==="bk"){step=1;render()}
 else if(t.id==="pay"){var m3=d.getElementById("pm3"),nm=d.getElementById("bn").value.trim(),em=d.getElementById("be").value.trim();
 if(!nm||!/^\S+@\S+\.\S+$/.test(em)){m3.textContent="Please enter your name and a valid email.";return}
 if(!d.getElementById("tc").checked){m3.textContent="Please agree to the terms to continue.";return}
-busy=true;t.textContent="Processing…";t.disabled=true;
+
+busy=true;
+t.textContent="Connecting to Paystack…";
+t.disabled=true;
+
+api("/api/checkout/initialize", {
+  method:"POST",
+  body:JSON.stringify({promo:promo})
+}).then(function(result){
+  if(!result.authorization_url){
+    throw new Error("Paystack did not return a payment link.");
+  }
+  window.location.href=result.authorization_url;
+}).catch(function(err){
+  busy=false;
+  t.disabled=false;
+  t.textContent="Try payment again";
+  m3.textContent=err.message||"Could not initialize payment.";
+});
 setTimeout(function(){var P=pend(dt),T=totals(P),id="ARD-"+Math.random().toString(36).slice(2,8).toUpperCase(),names=P.map(function(x){return window.SVC.map[x.s].n+" ("+tn(x.tier)+")"});
 dt.svcs.forEach(function(x){if(x.paid===false){x.paid=true;x.p=0}});dt.orders=(dt.orders||[]).concat([{id:id,total:T.tot,method:method,items:names,promo:promo,date:new Date().toISOString()}]);
 dt.ups.unshift(["Today","Payment received for "+names.join(", ")+". Your team will contact you to begin."]);window.ARD.save(u,dt);
