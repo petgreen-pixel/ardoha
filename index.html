@@ -796,7 +796,10 @@ if(location.hash.indexOf("#s-")===0)dispatchEvent(new HashChangeEvent("hashchang
 (function(){
 var mem={},K="ard_accts",S="ard_sess",API_BASE="https://ardoha-backend.onrender.com";
  function api(path,opts){opts=opts||{};opts.credentials="include";opts.headers=Object.assign({"Content-Type":"application/json"},opts.headers||{});return fetch(API_BASE+path,opts).then(function(r){return r.json().catch(function(){return {}}).then(function(b){if(!r.ok)throw new Error(b.error||"Request failed. Please try again.");return b})})}
- function dashboardData(b){return {svcs:(b.services||[]).map(function(x){return {s:x.slug,p:Number(x.progress)||0,note:x.note||"",paid:x.status==="pending"?false:true,tier:x.tier}}),ups:(b.updates||[]).map(function(x){return [x.created_at?new Date(x.created_at).toLocaleDateString():"Update",x.text||""]}),sample:false}}
+
+window.api=api;
+
+function dashboardData(b){return {svcs:(b.services||[]).map(function(x){return {s:x.slug,p:Number(x.progress)||0,note:x.note||"",paid:x.status==="pending"?false:true,tier:x.tier}}),ups:(b.updates||[]).map(function(x){return [x.created_at?new Date(x.created_at).toLocaleDateString():"Update",x.text||""]}),sample:false}}
 function jget(k,d){try{var v=localStorage.getItem(k);if(v)return JSON.parse(v)}catch(e){}return k in mem?mem[k]:d}
 function jset(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function jdel(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}
