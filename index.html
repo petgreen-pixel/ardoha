@@ -1062,11 +1062,7 @@ api("/api/checkout/initialize", {
   t.textContent="Try payment again";
   m3.textContent=err.message||"Could not initialize payment.";
 });
-setTimeout(function(){var P=pend(dt),T=totals(P),id="ARD-"+Math.random().toString(36).slice(2,8).toUpperCase(),names=P.map(function(x){return window.SVC.map[x.s].n+" ("+tn(x.tier)+")"});
-dt.svcs.forEach(function(x){if(x.paid===false){x.paid=true;x.p=0}});dt.orders=(dt.orders||[]).concat([{id:id,total:T.tot,method:method,items:names,promo:promo,date:new Date().toISOString()}]);
-dt.ups.unshift(["Today","Payment received for "+names.join(", ")+". Your team will contact you to begin."]);window.ARD.save(u,dt);
-done={id:id,total:T.tot,items:names};promo=null;step=3;busy=false;upd();render();scrollTo(0,0);
-window.notify("success","Payment received. Thank you!","Order "+id+" is confirmed (demo). Your services are now active.",7000)},1700)}});
+}});
 el.addEventListener("change",function(e){if(e.target.name==="pm"){method=e.target.value;render()}});
 addEventListener("hashchange",function(){upd();if(location.hash==="#checkout"&&U()){if(step===3)step=1;render()}});
 upd();if(location.hash==="#checkout")dispatchEvent(new HashChangeEvent("hashchange"));
