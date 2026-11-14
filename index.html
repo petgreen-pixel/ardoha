@@ -855,9 +855,36 @@ el.querySelectorAll("[data-rm]").forEach(function(b){b.onclick=function(){d.svcs
 var ub=document.getElementById("ub"),fw=document.getElementById("ufab");if(ub){ub.onclick=function(e){e.stopPropagation();var o=fw.classList.toggle("open");ub.setAttribute("aria-expanded",o)};el.onclick=function(e){if(!e.target.closest("#ufab")){fw.classList.remove("open");ub.setAttribute("aria-expanded","false")}};fw.onkeydown=function(e){if(e.key==="Escape"){fw.classList.remove("open");ub.setAttribute("aria-expanded","false");ub.focus()}}}
 var sb=document.getElementById("smp");if(sb)sb.onclick=function(){sample(u)};
 var cb=document.getElementById("clr");if(cb)cb.onclick=function(){save(u,{svcs:d.svcs.filter(function(x){return x.paid===false}),ups:[],sample:false});render()}}
-window.ARD={user:user,data:data,save:save,render:render,hydrate:function(u,d){var a=jget(K,{});a[u.email]={name:u.name,email:u.email,title:u.title||"",goal:u.goal||"unsure",provider:u.provider};jset(K,a);jset(S,u.email);jset("ard_d_"+u.email,d);icon();window.CART&&window.CART.upd()},clear:function(){jdel(S);icon();window.CART&&window.CART.upd()},loginAs:function(){notify("warning","Google sign-in is not ready yet","Please use your email and password for now.")},add:function(s,tier){var u=user();if(!u){notify("warning","Please log in first","Log in or sign up to add services to your plan.");go("account");return}
-var d=data(u);if(d.svcs.some(function(x){return x.s===s})){notify("info","Already in your plan","");go("dashboard");return}
-d.svcs.push({s:s,p:0,paid:false,tier:tier||"starter"});d.ups.unshift(["Today","Added "+window.SVC.map[s].n+" to your plan. Awaiting payment."]);save(u,d);window.CART&&window.CART.upd();notify("success","Added to your plan","It is pending payment. Pay from your dashboard to start.");go("dashboard")}};
+window.ARD={user:user,data:data,save:save,render:render,hydrate:function(u,d){var a=jget(K,{});a[u.email]={name:u.name,email:u.email,title:u.title||"",goal:u.goal||"unsure",provider:u.provider};jset(K,a);jset(S,u.email);jset("ard_d_"+u.email,d);icon();window.CART&&window.CART.upd()},clear:function(){jdel(S);icon();window.CART&&window.CART.upd()},loginAs:function(){notify("warning","Google sign-in is not ready yet","Please use your email and password for now.")},add:function(s,tier){
+add:async function(s,tier){
+  var u=user();
+  if(!u){
+    notify("warning","Please log in first","Log in or sign up to add services.");
+    go("account");
+    return;
+  }
+
+  try{
+    await api("/api/me/plan",{
+      method:"POST",
+      body:JSON.stringify({
+        slug:s,
+        tier:tier||"starter"
+      })
+    });
+
+    var dash=await api("/api/me/dashboard");
+    window.ARD.hydrate(u,dashboardData(dash));
+
+    window.CART&&window.CART.upd();
+    notify("success","Added to your plan","Your service has been saved successfully.");
+    go("dashboard");
+
+  }catch(err){
+    notify("error","Could not add service",err.message||"Please try again.");
+  }
+}
+};
 var _r=window.renderSvc;window.renderSvc=function(s){_r(s);var w=document.querySelector("#p-service .sphead .wrap");if(w){var b=document.createElement("button");b.className="btn a";b.style.setProperty("--k",8);b.style.marginLeft="12px";b.textContent="Add to my plan";b.onclick=function(){window.ARD.add(s)};w.appendChild(b)}document.querySelectorAll("#p-service .tier button[data-tier]").forEach(function(t){t.onclick=function(){window.ARD.add(s,t.dataset.tier)}})};
 addEventListener("hashchange",function(){var h=location.hash;if(h==="#account"&&user()){location.replace("#dashboard");return}if(h==="#dashboard"&&user())render()});
 jdel(S);icon();setMode("in");
