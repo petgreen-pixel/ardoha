@@ -1051,8 +1051,7 @@ busy=true;
 t.textContent="Connecting to Paystack…";
 t.disabled=true;
 
-api("/api/checkout/initialize", {
-  method:"POST",
+window.api("/api/checkout/initialize", {  method:"POST",
   body:JSON.stringify({promo:promo})
 }).then(function(result){
   if(!result.authorization_url){
