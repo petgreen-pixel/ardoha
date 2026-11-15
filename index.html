@@ -1090,9 +1090,27 @@ async function submit(){
     var result=await response.json().catch(function(){return {}});
 
     if(!response.ok){
-      throw new Error(result.error || "We couldn't complete your booking. Please try again.");
-    }
+  if(response.status===409){
+    var kd=key(selD);
 
+    try{
+      var takenResponse=await fetch(
+        BACKEND.replace("/api/bookings","/api/bookings/taken")+"?date="+encodeURIComponent(kd)
+      );
+
+      var takenData=await takenResponse.json();
+
+      window.__taken=window.__taken||{};
+      window.__taken[kd]=takenData.times||[];
+
+      draw();
+
+    }catch(refreshError){
+      console.error("Could not refresh available times:",refreshError);
+    }
+  }
+  throw new Error(result.error || "We couldn't complete your booking. Please try again.");
+}
     if(!result.ok || !result.saved){
       throw new Error("Your booking could not be confirmed. Please try again.");
     }
