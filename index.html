@@ -1053,7 +1053,36 @@ else{main='<div class="sbx'+a()+'"><h3>Your details</h3><label>Full name<input i
 el.innerHTML='<section class="dh"><div class="wrap"><p class="kick">Checkout</p><h2 class="dgreet">'+title+"</h2>"+stp+'</div></section><section><div class="wrap cog'+(side?"":" one")+'"><div>'+main+"</div>"+side+"</div></section>"}
 el.addEventListener("click",function(e){var t=e.target.closest("button"),u=U();if(!t||!u||busy)return;var dt=window.ARD.data(u);
 if(t.classList.contains("tb")){dt.svcs.forEach(function(x){if(x.s===t.dataset.s&&x.paid===false)x.tier=t.dataset.t});window.ARD.save(u,dt);render()}
-else if(t.dataset.rm){dt.svcs=dt.svcs.filter(function(x){return!(x.s===t.dataset.rm&&x.paid===false)});window.ARD.save(u,dt);window.notify("info","Removed from your cart","");upd();render()}
+
+else if(t.dataset.rm){
+  window.api("/api/me/plan",{
+    method:"DELETE",
+    body:JSON.stringify({slug:t.dataset.rm})
+  }).then(function(b){
+    window.ARD.hydrate(u,{
+      svcs:(b.services||[]).map(function(x){
+        return {
+          s:x.slug,
+          p:Number(x.progress)||0,
+          note:x.note||"",
+          paid:x.status==="pending"?false:true,
+          tier:x.tier
+        };
+      }),
+      ups:(b.updates||[]).map(function(x){
+        return [
+          x.created_at?new Date(x.created_at).toLocaleDateString():"Update",
+          x.text||""
+        ];
+      }),
+      sample:false
+    });
+    upd();
+    render();
+    window.notify("success","Service removed","Your plan has been updated.");
+  }).catch(function(err){
+    window.notify("error","Could not remove service",err.message||"Please try again.");
+  });}
 else if(t.id==="pa"){var c=d.getElementById("pc").value.trim().toUpperCase(),m=d.getElementById("pm2");if(CODES[c]){promo=c;window.notify("success","Promo applied","You save "+Math.round(CODES[c]*100)+"% on this order.");render()}else m.textContent="That code isn't valid."}
 else if(t.id==="nx"){step=2;render();scrollTo(0,0)}
 else if(t.id==="bk"){step=1;render()}
