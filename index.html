@@ -1077,8 +1077,9 @@ async function submit(){
     tz:tz,
     created:new Date().toISOString()
   };
-
-  m.textContent="Submitting your booking...";
+var bookButton=d.getElementById("cb");
+if(bookButton)bookButton.disabled=true;
+m.textContent="Submitting your booking...";
 
   try{
     var response=await fetch(BACKEND,{
