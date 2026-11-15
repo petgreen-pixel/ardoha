@@ -714,11 +714,59 @@ document.querySelectorAll("#menu a").forEach(function(a){if(a.getAttribute("href
 document.title="Ardoha | "+(sv?window.SVC.map[sv.slice(2)].n:T[h]);ml.classList.remove("open");mb.setAttribute("aria-expanded","false");window.scrollTo(0,0)}
 mb.onclick=function(){var o=ml.classList.toggle("open");mb.setAttribute("aria-expanded",o)};
 window.addEventListener("hashchange",show);show();
-document.getElementById("cf").onsubmit=function(e){e.preventDefault();var f=e.target,m=document.getElementById("fm");
-if(!f.name.value||!f.email.value.includes("@")){m.textContent="Please add your name and a valid email.";return}
-var b="Name: "+f.name.value+"\nEmail: "+f.email.value+"\nBook: "+f.title.value+"\nGenre: "+f.genre.value+"\nGoal: "+f.goal.value+"\nBudget: "+f.budget.value;
-m.textContent="Opening your email app to send this. (Form will connect to your inbox when we go live.)";window.notify&&notify("info","Your message is ready","Send it from your email app and we'll get back to you.");
-location.href="mailto:chat@ardohadigitalmarketing.online?subject="+encodeURIComponent("New enquiry from "+f.name.value)+"&body="+encodeURIComponent(b)}})();
+
+document.getElementById("cf").onsubmit = function(e) {
+  e.preventDefault();
+
+  var f = e.target;
+  var m = document.getElementById("fm");
+
+  var name = f.elements.namedItem("name").value.trim();
+  var email = f.elements.namedItem("email").value.trim();
+
+  if (!name || !email.includes("@")) {
+    m.textContent = "Please add your name and a valid email.";
+    return;
+  }
+
+  m.textContent = "Sending your enquiry...";
+
+  window.api("/api/contact", {
+    method: "POST",
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      title: f.elements.namedItem("title").value.trim(),
+      genre: f.elements.namedItem("genre").value,
+      goal: f.elements.namedItem("goal").value,
+      budget: f.elements.namedItem("budget").value
+    })
+  })
+  .then(function(result) {
+    if (!result.success || !result.saved) {
+      throw new Error("Your enquiry could not be saved.");
+    }
+
+    m.textContent = "Thank you! Your enquiry has been received. We'll be in touch soon.";
+
+    window.notify && window.notify(
+      "success",
+      "Enquiry received!",
+      "Thank you for contacting Ardoha."
+    );
+
+    f.reset();
+  })
+  .catch(function(err) {
+    m.textContent = err.message || "Could not send your enquiry. Please try again.";
+
+    window.notify && window.notify(
+      "error",
+      "Submission failed",
+      err.message || "Please try again."
+    );
+  });
+};
 </script>
 <script>
 (function(){var D=[["“Is this book even for me?”",["Goodreads lists and Listopia placement","Social media and book clubs","GEO, so you show up when readers search"]],
