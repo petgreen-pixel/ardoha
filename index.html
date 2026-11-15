@@ -1085,8 +1085,7 @@ body:JSON.stringify({slug:String(t.dataset.rm).trim()})  }).then(function(b){
 else if(t.id==="pa"){var c=d.getElementById("pc").value.trim().toUpperCase(),m=d.getElementById("pm2");if(CODES[c]){promo=c;window.notify("success","Promo applied","You save "+Math.round(CODES[c]*100)+"% on this order.");render()}else m.textContent="That code isn't valid."}
 else if(t.id==="nx"){step=2;render();scrollTo(0,0)}
 else if(t.id==="bk"){step=1;render()}
-else if(t.id==="pay"){var m3=d.getElementById("pm3"),nm=d.getElementById("bn").value.trim(),em=d.getElementById("be").value.trim();
-if(!nm||em.indexOf("@")===-1||em.indexOf(".")===-1){m3.textContent="Please enter your name and a valid email.";return}
+else if(t.id==="pay"){if(busy)return;var m3=d.getElementById("pm3"),nm=d.getElementById("bn").value.trim(),em=d.getElementById("be").value.trim();if(!nm||em.indexOf("@")===-1||em.indexOf(".")===-1){m3.textContent="Please enter your name and a valid email.";return}
 if(!d.getElementById("tc").checked){m3.textContent="Please agree to the terms to continue.";return}
 
 busy=true;
