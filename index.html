@@ -1133,15 +1133,15 @@ m.textContent="Submitting your booking...";
       selD=null;
       selT=null;
       draw();
-    };
+    };})();
 
-    window.notify("success","Call booking received!","We've received your request for "+p.label+" at "+p.time+".",7000);
+  window.notify("success","Call booking received!","We've received your request for "+p.label+" at "+p.time+".",7000);
 
   }catch(err){if(bookButton)bookButton.disabled=false;
     m.textContent=err.message||"We couldn't submit your booking. Please try again.";
     window.notify("error","Booking unsuccessful",m.textContent);
   }
-}})();
+}
 </script>
 
 <script>
