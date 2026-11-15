@@ -1045,7 +1045,7 @@ else{main='<div class="sbx'+a()+'"><h3>Your details</h3><label>Full name<input i
 '</div><div class="pmd">'+
 (method==="card"
   ? "Your payment will be securely processed by Paystack. Your card details are handled directly by Paystack."
-  : "Bank: [bank name] · Account: [account number] · Reference: your order number. Your services start once the transfer is confirmed."
+  : "After you continue, Paystack will display the bank account details for this transaction. Use the exact account number and reference shown there. Your services will start once Paystack confirms your payment."
 )+
 '</div><label class="chk"><input type="checkbox" id="tc"> I agree to the terms and refund policy</label>'+
 '<p class="demo">Secure payment powered by Paystack.</p></div>'}side='<aside class="sum'+a()+'"><h3>Order summary</h3>'+(step===2?P.map(function(x){return'<div class="ln2"><span>'+window.SVC.map[x.s].n+' · '+tn(x.tier)+"</span><b>"+money(price(x.s,x.tier||"starter"))+"</b></div>"}).join(""):"")+'<div class="ln2"><span>Subtotal</span><b>'+money(T.sub)+"</b></div>"+(T.ds?'<div class="ln2 ds"><span>Promo '+promo+'</span><b>−'+money(T.ds)+"</b></div>":"")+'<div class="ln2 tot"><span>Total</span><b>'+money(T.tot)+"</b></div>"+
