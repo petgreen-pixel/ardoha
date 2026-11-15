@@ -1054,10 +1054,9 @@ el.innerHTML='<section class="dh"><div class="wrap"><p class="kick">Checkout</p>
 d.addEventListener("click",function(e){var t=e.target.closest("button"),u=U();if(!t||!u||busy)return;var dt=window.ARD.data(u);
 if(t.classList.contains("tb")){dt.svcs.forEach(function(x){if(x.s===t.dataset.s&&x.paid===false)x.tier=t.dataset.t});window.ARD.save(u,dt);render()}
 else if(t.dataset.rm){
-  window.api("/api/me/plan",{
+ console.log("SERVICE SLUG:", t.dataset.rm);window.api("/api/me/plan",{
     method:"DELETE",
-    body:JSON.stringify({slug:t.dataset.rm})
-  }).then(function(b){
+body:JSON.stringify({slug:String(t.dataset.rm).trim()})  }).then(function(b){
     window.ARD.hydrate(u,{
       svcs:(b.services||[]).map(function(x){
         return {
