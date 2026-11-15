@@ -1045,17 +1045,85 @@ else if(t.id==="cx"){view=new Date(view.getFullYear(),view.getMonth()+1,1);draw(
 else if(t.classList.contains("dy")){selD=new Date(view.getFullYear(),view.getMonth(),+t.dataset.d);selT=null;draw();var s=cal.querySelector(".sl");if(s)s.classList.add("rv");if(BACKEND){var kd=key(selD);fetch(BACKEND.replace("/api/bookings","/api/bookings/taken")+"?date="+encodeURIComponent(kd)).then(function(r){return r.json()}).then(function(j){window.__taken=window.__taken||{};window.__taken[kd]=j.times||[];if(selD&&key(selD)===kd)draw()}).catch(function(){})}}
 else if(t.classList.contains("ts")){selT=t.dataset.t;var nv=d.getElementById("cb-n")?d.getElementById("cb-n").value:"";draw();var c=cal.querySelector(".cd");if(c)c.classList.add("rv")}
 else if(t.id==="cb")submit()});
-function submit(){var n=d.getElementById("cb-n").value.trim(),e=d.getElementById("cb-e").value.trim(),m=d.getElementById("cb-m");
-if(!n){m.textContent="Please tell us your name.";return}if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Please enter a valid email address.";return}
-var p={name:n,email:e,topic:d.getElementById("cb-t").value.trim(),date:key(selD),time:selT,label:lab(selD),tz:tz,created:new Date().toISOString()},L=bk().concat([p]);bset(L);
-if(BACKEND){fetch(BACKEND,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(function(r){if(r&&r.status===409)window.notify("warning","That time was just taken","Please choose another slot and book again.")}).catch(function(){window.notify("warning","Saved, but not sent","We couldn't reach the server. We'll retry shortly.")})}
-var hr=parseInt(selT),pm=/PM/.test(selT)&&hr!==12;hr=pm?hr+12:hr;var z=function(v){return v<10?"0"+v:v},ds=selD.getFullYear()+z(selD.getMonth()+1)+z(selD.getDate()),
-g="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Ardoha free call")+"&dates="+ds+"T"+z(hr)+"0000/"+ds+"T"+z(hr)+"3000&ctz="+encodeURIComponent(tz)+"&details="+encodeURIComponent("Free 30-minute call with Ardoha Marketing Agency");
-cal.innerHTML='<div class="done"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><path d="M5 10.5l3.5 3.5 6.5-8"/></svg><h3>You\'re booked, '+esc(n.split(" ")[0])+'!</h3><p>'+esc(p.label)+' at '+esc(p.time)+'<br><small>'+esc(tz)+'</small></p><p>Thank you. We\'ll get back to you with a confirmation shortly.</p><div class="row"><a class="btn solid" href="'+g+'" target="_blank" rel="noopener">Add to Google Calendar</a><button type="button" class="btn" id="cn">Book another</button></div></div>';
-d.getElementById("cn").onclick=function(){selD=null;selT=null;draw()};
-window.notify("success","Call booked. Thank you!","We've reserved "+p.label+" at "+p.time+". We'll get back to you shortly.",7000)}
-if(cal)draw();
-})();
+
+async function submit(){
+  var n=d.getElementById("cb-n").value.trim(),
+      e=d.getElementById("cb-e").value.trim(),
+      m=d.getElementById("cb-m");
+
+  if(!n){m.textContent="Please tell us your name.";return}
+  if(!/^\S+@\S+\.\S+$/.test(e)){
+    m.textContent="Please enter a valid email address.";
+    return;
+  }
+
+  if(!selD || !selT){
+    m.textContent="Please choose a date and time.";
+    return;
+  }
+
+  if(!BACKEND){
+    m.textContent="Booking service is unavailable. Please try again shortly.";
+    return;
+  }
+
+  var p={
+    name:n,
+    email:e,
+    topic:d.getElementById("cb-t").value.trim(),
+    date:key(selD),
+    time:selT,
+    label:lab(selD),
+    tz:tz,
+    created:new Date().toISOString()
+  };
+
+  m.textContent="Submitting your booking...";
+
+  try{
+    var response=await fetch(BACKEND,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(p)
+    });
+
+    var result=await response.json().catch(function(){return {}});
+
+    if(!response.ok){
+      throw new Error(result.error || "We couldn't complete your booking. Please try again.");
+    }
+
+    if(!result.ok || !result.saved){
+      throw new Error("Your booking could not be confirmed. Please try again.");
+    }
+
+    var L=bk().concat([p]);
+    bset(L);
+
+    var hr=parseInt(selT),
+        pm=/PM/.test(selT)&&hr!==12;
+
+    hr=pm?hr+12:hr;
+
+    var z=function(v){return v<10?"0"+v:v},
+        ds=selD.getFullYear()+z(selD.getMonth()+1)+z(selD.getDate()),
+        g="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Ardoha free call")+"&dates="+ds+"T"+z(hr)+"0000/"+ds+"T"+z(hr)+"3000&ctz="+encodeURIComponent(tz)+"&details="+encodeURIComponent("Free 30-minute call with Ardoha Marketing Agency");
+
+    cal.innerHTML='<div class="done"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><path d="M5 10.5l3.5 3.5 6.5-8"/></svg><h3>You\'re booked, '+esc(n.split(" ")[0])+'!</h3><p>'+esc(p.label)+' at '+esc(p.time)+'<br><small>'+esc(tz)+'</small></p><p>Thank you. We\'ve received your booking request and will contact you to confirm the call.</p><div class="row"><a class="btn solid" href="'+g+'" target="_blank" rel="noopener">Add to Google Calendar</a><button type="button" class="btn" id="cn">Book another</button></div></div>';
+
+    d.getElementById("cn").onclick=function(){
+      selD=null;
+      selT=null;
+      draw();
+    };
+
+    window.notify("success","Call booking received!","We've received your request for "+p.label+" at "+p.time+".",7000);
+
+  }catch(err){
+    m.textContent=err.message||"We couldn't submit your booking. Please try again.";
+    window.notify("error","Booking unsuccessful",m.textContent);
+  }
+}
 </script>
 
 <script>
