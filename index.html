@@ -1044,7 +1044,7 @@ else if(t.id==="pa"){var c=d.getElementById("pc").value.trim().toUpperCase(),m=d
 else if(t.id==="nx"){step=2;render();scrollTo(0,0)}
 else if(t.id==="bk"){step=1;render()}
 else if(t.id==="pay"){var m3=d.getElementById("pm3"),nm=d.getElementById("bn").value.trim(),em=d.getElementById("be").value.trim();
-if(!nm||!/^\S+@\S+\.\S+$/.test(em)){m3.textContent="Please enter your name and a valid email.";return}
+if(!nm||em.indexOf("@")===-1||em.indexOf(".")===-1){m3.textContent="Please enter your name and a valid email.";return}
 if(!d.getElementById("tc").checked){m3.textContent="Please agree to the terms to continue.";return}
 
 busy=true;
