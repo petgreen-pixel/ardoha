@@ -908,6 +908,7 @@ function setMode(m){
  var resetToken = new URLSearchParams(window.location.search).get("reset_token");
 
 if(resetToken){
+  go("account");
   document.getElementById("resetPanel").hidden = false;
   document.querySelector(".seg").style.display = "none";
   document.getElementById("gbtn").style.display = "none";
