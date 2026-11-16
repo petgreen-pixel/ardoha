@@ -934,6 +934,50 @@ document.getElementById("forgotLink").onclick = async function(){
     M.textContent = err.message || "Could not send reset instructions. Please try again.";
   }finally{
     link.disabled = false;
+  }}; 
+document.getElementById("resetForm").onsubmit = async function(e){
+  e.preventDefault();
+  var password = document.getElementById("resetPassword").value;
+  var confirm = document.getElementById("resetConfirm").value;
+  var message = document.getElementById("resetMessage");
+  var submit = document.getElementById("resetSubmit");
+  var token = new URLSearchParams(window.location.search).get("reset_token");
+
+  if(password.length < 8){
+    message.textContent = "Your password must be at least 8 characters.";
+    return;
+  }
+
+  if(password !== confirm){
+    message.textContent = "Your passwords do not match.";
+    return;
+  }
+
+  if(!token){
+    message.textContent = "This reset link is invalid or has expired.";
+    return;
+  }
+
+  submit.disabled = true;
+  message.textContent = "Updating your password...";
+
+  try{
+    var result = await api("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({
+        token: token,
+        password: password
+      })
+    });
+
+    message.textContent = result.message || "Your password has been changed successfully.";
+
+    document.getElementById("resetForm").reset();
+
+  }catch(err){
+    message.textContent = err.message || "Could not reset your password. Please try again.";
+  }finally{
+    submit.disabled = false;
   }
 };
 F.onsubmit=async function(e){e.preventDefault();var em=F.email.value.trim().toLowerCase(),pw=F.password.value;
