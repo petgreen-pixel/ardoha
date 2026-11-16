@@ -981,9 +981,28 @@ document.getElementById("resetForm").onsubmit = async function(e){
       })
     });
 
-    message.textContent = result.message || "Your password has been changed successfully.";
+message.textContent = "Password changed successfully! Redirecting you to login...";
 
-    document.getElementById("resetForm").reset();
+document.getElementById("resetForm").reset();
+
+setTimeout(function(){
+  document.getElementById("resetPanel").hidden = true;
+
+  document.querySelector(".seg").style.display = "";
+  document.getElementById("gbtn").style.display = "";
+  document.querySelector(".or").style.display = "";
+  document.getElementById("af").style.display = "";
+
+  document.querySelectorAll(".note").forEach(function(el){
+    el.style.display = "";
+  });
+
+  window.history.replaceState({}, document.title, window.location.pathname);
+
+  setMode("in");
+
+  M.textContent = "Your password has been changed. Please log in with your new password.";
+}, 3000);
 
   }catch(err){
     message.textContent = err.message || "Could not reset your password. Please try again.";
