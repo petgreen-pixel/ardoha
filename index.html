@@ -905,7 +905,17 @@ function setMode(m){
   document.getElementById("forgotWrap").style.display=m==="in"?"":"none";
   M.textContent="";
   F.password.autocomplete=m==="up"?"new-password":"current-password";}
- 
+ var resetToken = new URLSearchParams(window.location.search).get("reset_token");
+
+if(resetToken){
+  document.getElementById("resetPanel").hidden = false;
+  document.querySelector(".seg").style.display = "none";
+  document.getElementById("gbtn").style.display = "none";
+  document.getElementById("gdemo").style.display = "none";
+  document.querySelector(".or").style.display = "none";
+  document.getElementById("af").style.display = "none";
+  document.querySelector(".note").style.display = "none";
+}
 document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){setMode(b.dataset.m)}});
 
 document.getElementById("forgotLink").onclick = async function(){
