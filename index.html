@@ -884,7 +884,8 @@ function setMode(m){
   F.password.autocomplete=m==="up"?"new-password":"current-password";}
  
 document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){setMode(b.dataset.m)}});
- document.getElementById("forgotLink").onclick = function(){
+
+document.getElementById("forgotLink").onclick = async function(){
   var email = F.email.value.trim().toLowerCase();
 
   if(!/^\S+@\S+\.\S+$/.test(email)){
@@ -893,7 +894,24 @@ document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(
     return;
   }
 
-  M.textContent = "Password recovery is being prepared...";
+  var link = document.getElementById("forgotLink");
+  link.disabled = true;
+  M.textContent = "Sending password reset instructions...";
+
+  try{
+    var result = await api("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({email: email})
+    });
+
+    M.textContent = result.message ||
+      "If an account exists with that email, a password reset link will be sent.";
+
+  }catch(err){
+    M.textContent = err.message || "Could not send reset instructions. Please try again.";
+  }finally{
+    link.disabled = false;
+  }
 };
 F.onsubmit=async function(e){e.preventDefault();var em=F.email.value.trim().toLowerCase(),pw=F.password.value;
  if(!/^\S+@\S+\.\S+$/.test(em)){M.textContent="Please enter a valid email address.";return}
