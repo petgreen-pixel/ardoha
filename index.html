@@ -697,7 +697,30 @@ header .nav .hbook{position:static;width:auto;box-shadow:none;border-radius:2px;
 <label class="su">Book title (optional)<input name="title"></label>
 <label class="su">Main goal<select name="goal"><option value="reach">Reach: get my book read</option><option value="sales">Sales: sell more copies</option><option value="endorse">Endorsement &amp; Ambassadorship</option><option value="unsure">Not sure yet</option></select></label>
 <button class="btn solid" type="submit" id="asub">Log in</button><p class="fm" id="am" role="alert"></p></form>
-<p class="note">Your account is securely stored in Ardoha’s database. Your password is protected and is never saved in this browser.</p></div></div></section></div>
+<p class="note">Your account is securely stored in Ardoha’s database. Your password is protected and is never saved in this browser.</p>
+<div id="resetPanel" hidden>
+  <h2>Reset your password</h2>
+  <p>Choose a new password for your Ardoha account.</p>
+
+  <form id="resetForm" novalidate>
+    <label>
+      New password
+      <input id="resetPassword" type="password" autocomplete="new-password" minlength="8" required>
+    </label>
+
+    <label>
+      Confirm new password
+      <input id="resetConfirm" type="password" autocomplete="new-password" minlength="8" required>
+    </label>
+
+    <button class="btn solid" type="submit" id="resetSubmit">
+      Reset password
+    </button>
+
+    <p class="fm" id="resetMessage" role="alert"></p>
+  </form>
+</div>
+</div></div></section></div>
 <div class="page" id="p-dashboard"><div id="dash"></div></div>
 <div class="page" id="p-checkout"><div id="co"></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
