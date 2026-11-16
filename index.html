@@ -951,7 +951,7 @@ document.getElementById("resetForm").onsubmit = async function(e){
   var confirm = document.getElementById("resetConfirm").value;
   var message = document.getElementById("resetMessage");
   var submit = document.getElementById("resetSubmit");
-  var token = new URLSearchParams(window.location.search).get("reset_token");
+  var token = resetToken;
 
   if(password.length < 8){
     message.textContent = "Your password must be at least 8 characters.";
