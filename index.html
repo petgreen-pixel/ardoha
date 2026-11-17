@@ -1027,6 +1027,42 @@ F.onsubmit=async function(e){e.preventDefault();var em=F.email.value.trim().toLo
  }catch(err){M.textContent=err.message||"Could not connect. Please try again."}
  finally{submit.disabled=false}
  };
+ window.handleGoogleCredential = async function(response){
+  if(!response || !response.credential){
+    M.textContent = "Google did not return a valid sign-in credential.";
+    return;
+  }
+
+  M.textContent = "Signing you in with Google...";
+
+  try{
+    var result = await api("/api/auth/google",{
+      method:"POST",
+      body:JSON.stringify({
+        credential:response.credential
+      })
+    });
+
+    var dash = await api("/api/me/dashboard");
+
+    window.ARD.hydrate(result.user,dashboardData(dash));
+
+    F.password.value = "";
+    M.textContent = "";
+    icon();
+
+    notify(
+      "success",
+      result.isNew ? "Welcome to Ardoha!" : "Welcome back!",
+      result.isNew ? "Your account has been created successfully." : "Your account is ready."
+    );
+
+    go("dashboard");
+
+  }catch(err){
+    M.textContent = err.message || "Google sign-in failed. Please try again.";
+  }
+};
  /* dashboard */
 var ST=["Review and plan","Build and launch","Report and refine"];
 function status(p){return p<=0?"Awaiting kickoff":p>=100?"Completed":ST[p<34?0:p<67?1:2]}
